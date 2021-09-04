@@ -67,14 +67,14 @@ contract UniversalNFT is ERC721URIStorage {
         _dataRegisterProofs[tokenId] = dataRegisterProof;
     }
 
-    function mintDataNTF(address player, string memory tokenURI, string memory dataIdOnchain, string memory dataRegisterProof)
+    function mintDataNTF(address receiver, string memory tokenURI, string memory dataIdOnchain, string memory dataRegisterProof)
         public
         returns (uint256)
     {
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
-        _mint(player, newItemId);
+        _mint(receiver, newItemId);
         _setTokenURI(newItemId, tokenURI);
         _setDataIdOnchain(newItemId, dataIdOnchain);
         _setDataRegisterProof(newItemId, dataRegisterProof);
