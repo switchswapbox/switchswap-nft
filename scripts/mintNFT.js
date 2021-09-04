@@ -1,12 +1,13 @@
 async function main() {
-  const address = "0xE3e49B506F93357f5dC8Ce8C8338f794518c2ef2";
+  const address = "0x7595C9430A1B315ae902b2Da2D95eB26AeEB5329";
   const UniversalNFT = await ethers.getContractFactory("UniversalNFT");
   const universalNFT = await UniversalNFT.attach(address);
 
-  const tokenId = await universalNFT.mintUniversalNTF(
+  const tokenId = await universalNFT.mintDataNTF(
     "0x6d26C405BB919643AfA2c89e8A138d2015b3A62F",
-    "ABC",
-    "CDE"
+    "https://gateway.pinata.cloud/ipfs/QmNxpDMiKJKUnVcQgxpWWz4jXiJpLAhdobBnpNGpftmxtk",
+    "ipfs://QmTnE4JFony1X2LWKuuGyNQkrKDTBSiZZowquiRqCskXig",
+    "crust://0xfdc3500246a8a95f8b51626f7d4627db74c327830affff7864f294917648e380"
   );
   console.log(tokenId);
 }
