@@ -1,5 +1,5 @@
 async function main() {
-  const address = "0x7595C9430A1B315ae902b2Da2D95eB26AeEB5329";
+  const address = "0xfb5b22e792666bc2eed8782cffd5168ef9199903";
   const UniversalNFT = await ethers.getContractFactory("UniversalNFT");
   const universalNFT = await UniversalNFT.attach(address);
 
