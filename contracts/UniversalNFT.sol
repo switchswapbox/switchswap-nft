@@ -1,10 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract UniversalNFT is ERC721URIStorage {
+contract UniversalNFT is
+    AccessControlEnumerable,
+    ERC721Enumerable,
+    ERC721Burnable,
+    ERC721URIStorage
+{
     // Naming Counters contract by Counters.Counter so that _tokenIds can call functions in Counters contract
     using Counters for Counters.Counter;
 
@@ -17,7 +26,39 @@ contract UniversalNFT is ERC721URIStorage {
     // Token dataRegisterProof onchain
     mapping(uint256 => string) private _dataRegisterProofs;
 
-    constructor() ERC721("Universal NFT", "UNS") {}
+    constructor() ERC721("Universal NFT", "UNS") {
+        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+    }
+
+    function _burn(uint256 tokenId) internal virtual override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId) public view virtual override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
+    }
+
+    function totalSupply() public view override(ERC721Enumerable) returns (uint256) {
+        return (_tokenIds.current());
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(AccessControlEnumerable, ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
 
     function getDataIdOnchain(uint256 tokenId) public view returns (string memory) {
         require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
@@ -67,7 +108,7 @@ contract UniversalNFT is ERC721URIStorage {
         _dataRegisterProofs[tokenId] = dataRegisterProof;
     }
 
-    function mintDataNTF(address receiver, string memory tokenURI, string memory dataIdOnchain, string memory dataRegisterProof)
+    function mintDataNTF(address receiver, string memory tokenURIdata, string memory dataIdOnchain, string memory dataRegisterProof)
         public
         returns (uint256)
     {
@@ -75,7 +116,7 @@ contract UniversalNFT is ERC721URIStorage {
 
         uint256 newItemId = _tokenIds.current();
         _mint(receiver, newItemId);
-        _setTokenURI(newItemId, tokenURI);
+        _setTokenURI(newItemId, tokenURIdata);
         _setDataIdOnchain(newItemId, dataIdOnchain);
         _setDataRegisterProof(newItemId, dataRegisterProof);
 
