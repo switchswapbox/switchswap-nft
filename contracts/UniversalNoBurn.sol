@@ -33,6 +33,10 @@ contract UniversalNFT is
         return super.tokenURI(tokenId);
     }
 
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+
     function totalSupply() public view override(ERC721Enumerable) returns (uint256) {
         return (_tokenIds.current());
     }
