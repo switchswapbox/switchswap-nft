@@ -14,7 +14,7 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const UniversalNFT = await hre.ethers.getContractFactory("UniversalNFT");
+  const UniversalNFT = await hre.ethers.getContractFactory("UniversalNFTV3");
   const universalNFT = await UniversalNFT.deploy();
 
   await universalNFT.deployed();

@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract UniversalNFT is
-    ERC721Enumerable,
-    ERC721URIStorage
+contract UniversalNFTV3 is
+    ERC721URIStorage,
+    ERC721Enumerable
 {
     // Naming Counters contract by Counters.Counter so that _tokenIds can call functions in Counters contract
     using Counters for Counters.Counter;
@@ -25,8 +25,24 @@ contract UniversalNFT is
     constructor() ERC721("Universal NFT", "UNS") {
     }
 
-    function totalSupply() public view override(ERC721Enumerable) returns (uint256) {
-        return (_tokenIds.current());
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        ERC721URIStorage._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
+        return super.tokenURI(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
     }
 
     function getDataIdOnchain(uint256 tokenId) public view returns (string memory) {
