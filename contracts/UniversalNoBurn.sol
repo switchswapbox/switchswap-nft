@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract UniversalNFT is
-    ERC721Enumerable,
-    ERC721URIStorage
+    ERC721URIStorage,
+    ERC721Enumerable
 {
     // Naming Counters contract by Counters.Counter so that _tokenIds can call functions in Counters contract
     using Counters for Counters.Counter;
@@ -23,6 +23,20 @@ contract UniversalNFT is
     mapping(uint256 => string) private _dataRegisterProofs;
 
     constructor() ERC721("Universal NFT", "UNS") {
+    }
+
+    /**
+     * @dev Destroys `tokenId`.
+     * The approval is cleared when the token is burned.
+     *
+     * Requirements:
+     *
+     * - `tokenId` must exist.
+     *
+     * Emits a {Transfer} event.
+     */
+    function _burn(uint256 tokenId) internal virtual override(ERC721, ERC721URIStorage) {
+        ERC721URIStorage._burn(tokenId);
     }
 
     function totalSupply() public view override(ERC721Enumerable) returns (uint256) {
