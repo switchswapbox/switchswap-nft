@@ -37,6 +37,14 @@ contract UniversalNFT is
         return super.supportsInterface(interfaceId);
     }
 
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
     function getDataIdOnchain(uint256 tokenId) public view returns (string memory) {
         require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
 
