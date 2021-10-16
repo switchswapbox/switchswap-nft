@@ -6,14 +6,12 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract UniversalNFTV3 is
+contract UniverseNFT is
     ERC721URIStorage,
     ERC721Enumerable
 {
-    // Naming Counters contract by Counters.Counter so that _tokenIds can call functions in Counters contract
     using Counters for Counters.Counter;
 
-    // _tokenIds has the data type of Struct Counter in Counters.sol
     Counters.Counter private _tokenIds;
 
     // Token CID card onchain
@@ -22,7 +20,7 @@ contract UniversalNFTV3 is
     // Token dataRegisterProof onchain
     mapping(uint256 => string) private _dataRegisterProofs;
 
-    constructor() ERC721("Universal NFT", "UNS") {
+    constructor() ERC721("Universe NFT", "UNIFT") {
     }
 
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
@@ -51,17 +49,12 @@ contract UniversalNFTV3 is
         string memory _dataIdOnchain = _dataIdOnchains[tokenId];
         string memory base = _baseURI();
 
-        // If there is no base URI, return the token URI.
         if (bytes(base).length == 0) {
             return _dataIdOnchain;
         }
-        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
         if (bytes(_dataIdOnchain).length > 0) {
             return string(abi.encodePacked(base, _dataIdOnchain));
         }
-
-        // TODO: return when base != "", _tokenCID == ""
-        // return super.tokenURI(tokenId);
         return "";
     }
 
@@ -71,17 +64,12 @@ contract UniversalNFTV3 is
         string memory _dataRegisterProof = _dataRegisterProofs[tokenId];
         string memory base = _baseURI();
 
-        // If there is no base URI, return the token URI.
         if (bytes(base).length == 0) {
             return _dataRegisterProof;
         }
-        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
         if (bytes(_dataRegisterProof).length > 0) {
             return string(abi.encodePacked(base, _dataRegisterProof));
         }
-
-        // TODO: return when base != "", _tokenCID == ""
-        // return super.tokenURI(tokenId);
         return "";
     }
 
