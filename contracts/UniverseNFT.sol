@@ -17,8 +17,8 @@ contract UniverseNFT is
     // Token CID card onchain
     mapping(uint256 => string) private _dataIdOnchains;
 
-    // Token dataRegisterProof onchain
-    mapping(uint256 => string) private _dataRegisterProofs;
+    // Token dataRegistrationProof onchain
+    mapping(uint256 => string) private _dataRegistrationProofs;
 
     constructor() ERC721("Universe NFT", "UNIFT") {
     }
@@ -58,17 +58,17 @@ contract UniverseNFT is
         return "";
     }
 
-    function getDataRegisterProof(uint256 tokenId) public view returns (string memory) {
+    function getDataRegistrationProof(uint256 tokenId) public view returns (string memory) {
         require(_exists(tokenId), "ERC721URIStorage: URI query for nonexistent token");
 
-        string memory _dataRegisterProof = _dataRegisterProofs[tokenId];
+        string memory _dataRegistrationProof = _dataRegistrationProofs[tokenId];
         string memory base = _baseURI();
 
         if (bytes(base).length == 0) {
-            return _dataRegisterProof;
+            return _dataRegistrationProof;
         }
-        if (bytes(_dataRegisterProof).length > 0) {
-            return string(abi.encodePacked(base, _dataRegisterProof));
+        if (bytes(_dataRegistrationProof).length > 0) {
+            return string(abi.encodePacked(base, _dataRegistrationProof));
         }
         return "";
     }
@@ -77,11 +77,11 @@ contract UniverseNFT is
         _dataIdOnchains[tokenId] = dataIdOnchain;
     }
 
-    function _setDataRegisterProof(uint256 tokenId, string memory dataRegisterProof) internal {
-        _dataRegisterProofs[tokenId] = dataRegisterProof;
+    function _setDataRegistrationProof(uint256 tokenId, string memory dataRegistrationProof) internal {
+        _dataRegistrationProofs[tokenId] = dataRegistrationProof;
     }
 
-    function mintDataNTF(address receiver, string memory tokenURIdata, string memory dataIdOnchain, string memory dataRegisterProof)
+    function mintDataNTF(address receiver, string memory tokenURIdata, string memory dataIdOnchain, string memory dataRegistrationProof)
         public
         returns (uint256)
     {
@@ -91,7 +91,7 @@ contract UniverseNFT is
         _mint(receiver, newItemId);
         _setTokenURI(newItemId, tokenURIdata);
         _setDataIdOnchain(newItemId, dataIdOnchain);
-        _setDataRegisterProof(newItemId, dataRegisterProof);
+        _setDataRegistrationProof(newItemId, dataRegistrationProof);
 
         return newItemId;
     }
