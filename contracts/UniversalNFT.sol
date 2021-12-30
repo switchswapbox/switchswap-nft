@@ -26,6 +26,12 @@ contract UniversalNFT is
     // Token dataRegisterProof onchain
     mapping(uint256 => string) private _dataRegisterProofs;
 
+    // NFT storage:
+    mapping (uint => uint256) public _dataTokenPrice;
+
+    // Balance storage:
+    mapping (address => uint256) public _balances;
+
     constructor() ERC721("Universal NFT", "UNS") {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }
@@ -119,7 +125,46 @@ contract UniversalNFT is
         _setTokenURI(newItemId, tokenURIdata);
         _setDataIdOnchain(newItemId, dataIdOnchain);
         _setDataRegisterProof(newItemId, dataRegisterProof);
+        _dataTokenPrice[newItemId] = 0;
 
         return newItemId;
+    }
+
+    function withdraw()
+        public
+        payable
+    {
+        uint balance = address(this).balance;
+        require(balance > 0, "No money left to withdraw");
+        (bool success, ) = (msg.sender).call{value: balance}("");
+        require(success, "Transfer failed.");
+    }
+
+    function getTokenPrice(uint256 _tokenId)
+        view public returns(uint256)
+    {
+        require(_exists(_tokenId), "ERC721URIStorage: URI query for nonexistent token");
+        return _dataTokenPrice[_tokenId];
+    }
+
+    function setTokenPrice(uint256 _tokenId, uint256 _newPrice)
+        public
+    {
+        require(_exists(_tokenId), "ERC721URIStorage: URI query for nonexistent token");
+        require(msg.sender == ownerOf(_tokenId), "You are not the owner of the token");
+        require(_newPrice > 0);
+        _dataTokenPrice[_tokenId] = _newPrice;
+    }
+
+    function purchaseToken(uint256 _tokenId)
+        public
+        payable 
+    {
+        require(msg.sender != address(0) && msg.sender != address(this), "Purchase not allowed");
+        require(msg.value >= _dataTokenPrice[_tokenId], "Insufisent balance!");
+        require(_exists(_tokenId));
+        address tokenSeller = ownerOf(_tokenId);
+        safeTransferFrom(tokenSeller, msg.sender, _tokenId);
+        // emit Received(msg.sender, _tokenId, msg.value, address(this).balance);
     }
 }
