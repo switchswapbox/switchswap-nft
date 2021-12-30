@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract UniversalNFT is
     AccessControlEnumerable,
@@ -16,6 +17,7 @@ contract UniversalNFT is
 {
     // Naming Counters contract by Counters.Counter so that _tokenIds can call functions in Counters contract
     using Counters for Counters.Counter;
+    using SafeMath for uint256;
 
     // _tokenIds has the data type of Struct Counter in Counters.sol
     Counters.Counter private _tokenIds;
@@ -29,8 +31,10 @@ contract UniversalNFT is
     // NFT storage:
     mapping (uint => uint256) public _dataTokenPrice;
 
-    // Balance storage:
-    mapping (address => uint256) public _balances;
+    // MATIC storage:
+    mapping (address => uint256) public _dataDeposit;
+
+    event Deposit(address user, uint amount, uint balance);
 
     constructor() ERC721("Universal NFT", "UNS") {
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
@@ -130,13 +134,31 @@ contract UniversalNFT is
         return newItemId;
     }
 
+    function deposit()
+        public
+        payable
+    {
+        require(msg.value > 0, "The amount must be greater than 0");
+        _dataDeposit[msg.sender] = _dataDeposit[msg.sender].add(msg.value);
+        emit Deposit(msg.sender, msg.value, _dataDeposit[msg.sender]);
+    }
+
+    function depositOf(address payee)
+        public
+        view
+        returns (uint256)
+    {
+        return _dataDeposit[payee];
+    }
+
     function withdraw()
         public
         payable
     {
-        uint balance = address(this).balance;
+        uint256 balance = _dataDeposit[msg.sender];
         require(balance > 0, "No money left to withdraw");
         (bool success, ) = (msg.sender).call{value: balance}("");
+        _dataDeposit[msg.sender] = 0;
         require(success, "Transfer failed.");
     }
 
@@ -165,6 +187,7 @@ contract UniversalNFT is
         require(_exists(_tokenId));
         address tokenSeller = ownerOf(_tokenId);
         safeTransferFrom(tokenSeller, msg.sender, _tokenId);
-        // emit Received(msg.sender, _tokenId, msg.value, address(this).balance);
+        (bool success, ) = tokenSeller.call{value: _dataTokenPrice[_tokenId]}("");
+        require(success, "Transfer failed.");
     }
 }
