@@ -186,7 +186,7 @@ contract UniversalNFT is
         require(msg.value >= _dataTokenPrice[_tokenId], "Insufisent balance!");
         require(_exists(_tokenId));
         address tokenSeller = ownerOf(_tokenId);
-        safeTransferFrom(tokenSeller, msg.sender, _tokenId);
+        _transfer(tokenSeller, msg.sender, _tokenId);
         (bool success, ) = tokenSeller.call{value: _dataTokenPrice[_tokenId]}("");
         require(success, "Transfer failed.");
     }

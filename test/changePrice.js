@@ -81,7 +81,9 @@ describe("UniversalNFT common functionalities", function () {
 
   it("Token selling", async function () {
     const [addr1, addr2] = await ethers.getSigners();
-    await this.nft.connect(addr1).deposit({ value: 100000000000000 });
+    await this.nft
+      .connect(addr1)
+      .deposit({ value: ethers.BigNumber.from(100000000000000000000n) });
     await this.nft
       .connect(addr2)
       .mintDataNTF(
@@ -91,14 +93,18 @@ describe("UniversalNFT common functionalities", function () {
         transaction2.dataRegisterProof
       );
 
-    await this.nft.connect(addr2).setTokenPrice(1, 100000000000000);
-    await this.nft.connect(addr2).approve(addr1.address, 1);
+    await this.nft
+      .connect(addr2)
+      .setTokenPrice(1, ethers.BigNumber.from(100000000000000000000n));
     const addr2Init = await provider.getBalance(addr2.address);
-    await this.nft.connect(addr1).purchaseToken(1, { value: 100000000000000 });
+    await this.nft.connect(addr1).purchaseToken(1, {
+      value: ethers.BigNumber.from(100000000000000000000n),
+    });
     const addr2Final = await provider.getBalance(addr2.address);
-    console.log(addr2Final - addr2Init);
-    expect(
-      (await this.nft.connect(addr2).depositOf(addr2.address)).toString()
-    ).to.equal("1000");
+    console.log(
+      addr2Init.toString(),
+      addr2Final.toString(),
+      addr2Final - addr2Init
+    );
   });
 });
