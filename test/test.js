@@ -60,7 +60,7 @@ describe("UniversalNFT/UniversalSwapNFT common functionalities", function () {
       (
         await this.swapNft
           .connect(addr2)
-          .getTokenPrice(this.nft.address, addr1.address)
+          .getTokenPrice(this.nft.address, addr1.address, 1)
       ).toString()
     ).to.equal("1000");
   });
@@ -79,7 +79,9 @@ describe("UniversalNFT/UniversalSwapNFT common functionalities", function () {
     await this.swapNft.connect(addr1).depositToken(this.nft.address, 1, 1000);
     await this.swapNft.connect(addr1).withdrawToken(this.nft.address, 1);
     expect(
-      this.swapNft.connect(addr2).getTokenPrice(this.nft.address, addr1.address)
+      this.swapNft
+        .connect(addr2)
+        .getTokenPrice(this.nft.address, addr1.address, 1)
     ).to.be.revertedWith("Token invalide or has been withdrawn!");
   });
 

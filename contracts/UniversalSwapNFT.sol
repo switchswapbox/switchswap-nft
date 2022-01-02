@@ -11,42 +11,42 @@ contract UniversalSwapNFT is
     using SafeMath for uint256;
 
     // NFT price storage:
-    // address of external contract -> owner address -> price
-    mapping (address => mapping (address => uint256)) public _dataToken;
+    // address of external contract -> owner address -> external tokenID -> price
+    mapping (address => mapping (address => mapping(uint256 => uint256))) public _dataToken;
 
     function onERC721Received(address, address, uint256, bytes memory) public virtual override returns (bytes4) {
         return this.onERC721Received.selector;
     }
 
-    function depositToken(address token, uint256 externalTokenID, uint256 price)
+    function depositToken(address tokenContract, uint256 externalTokenID, uint256 price)
         public
         payable
     {
-        require(token != address(0x0), "Invalide token");
+        require(tokenContract != address(0x0), "Invalide token");
         require(price > 0, "Invalide price");
-        require(ERC721(token).ownerOf(externalTokenID) == msg.sender, "Only token's owner");
-        ERC721(token).safeTransferFrom(msg.sender, address(this), externalTokenID);
-        _dataToken[token][msg.sender] = price;
+        require(ERC721(tokenContract).ownerOf(externalTokenID) == msg.sender, "Only token's owner");
+        ERC721(tokenContract).safeTransferFrom(msg.sender, address(this), externalTokenID);
+        _dataToken[tokenContract][msg.sender][externalTokenID] = price;
     }
 
-    function getTokenPrice(address token, address currentOwner)
+    function getTokenPrice(address tokenContract, address currentOwner, uint256 externalTokenID)
         public
         view
         returns (uint256)
     {
-        uint256 price = _dataToken[token][currentOwner];
+        uint256 price = _dataToken[tokenContract][currentOwner][externalTokenID];
         require(price > 0, "Token invalide or has been withdrawn!");
         return price;
     }
 
-    function withdrawToken(address token, uint256 externalTokenID)
+    function withdrawToken(address tokenContract, uint256 externalTokenID)
         public
         payable
     {
-        require(token != address(0x0), "Invalide token");
-        require(_dataToken[token][msg.sender] != 0, "Only token's owner");
-        _dataToken[token][msg.sender] = 0;
-        ERC721(token).safeTransferFrom(address(this), msg.sender, externalTokenID);
+        require(tokenContract != address(0x0), "Invalide token");
+        require(_dataToken[tokenContract][msg.sender][externalTokenID] != 0, "Only token's owner");
+        _dataToken[tokenContract][msg.sender][externalTokenID] = 0;
+        ERC721(tokenContract).safeTransferFrom(address(this), msg.sender, externalTokenID);
     }
 
     // function setTokenPrice(uint256 _tokenId, uint256 _newPrice)
