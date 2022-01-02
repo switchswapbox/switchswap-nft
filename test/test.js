@@ -44,28 +44,44 @@ describe("UniversalNFT/UniversalSwapNFT common functionalities", function () {
     expect((await this.nft.ownerOf(1)).toString()).to.equal(addr1.address);
   });
 
-  // it("Set/Get token price", async function () {
-  //   const [addr1, addr2] = await ethers.getSigners();
-  //   await this.nft
-  //     .connect(addr1)
-  //     .mintDataNTF(
-  //       addr1.address,
-  //       transaction1.tokenURI,
-  //       transaction1.dataIdOnchain,
-  //       transaction1.dataRegisterProof
-  //     );
-  //   await this.nft.connect(addr1).setTokenPrice(1, 1000);
-  //   expect(
-  //     (await this.nft.connect(addr2).getTokenPrice(1)).toString()
-  //   ).to.equal("1000");
-  // });
+  it("Deposit token", async function () {
+    const [addr1, addr2] = await ethers.getSigners();
+    await this.nft
+      .connect(addr1)
+      .mintDataNTF(
+        addr1.address,
+        transaction1.tokenURI,
+        transaction1.dataIdOnchain,
+        transaction1.dataRegisterProof
+      );
+    await this.nft.connect(addr1).approve(this.swapNft.address, 1);
+    await this.swapNft.connect(addr1).depositToken(this.nft.address, 1, 1000);
+    expect(
+      (
+        await this.swapNft
+          .connect(addr2)
+          .getTokenPrice(this.nft.address, addr1.address)
+      ).toString()
+    ).to.equal("1000");
+  });
 
-  // it("Withdraw without money", async function () {
-  //   const [addr1] = await ethers.getSigners();
-  //   await expect(this.nft.connect(addr1).withdraw()).to.be.revertedWith(
-  //     "No money left to withdraw"
-  //   );
-  // });
+  it("Withdraw token", async function () {
+    const [addr1, addr2] = await ethers.getSigners();
+    await this.nft
+      .connect(addr1)
+      .mintDataNTF(
+        addr1.address,
+        transaction1.tokenURI,
+        transaction1.dataIdOnchain,
+        transaction1.dataRegisterProof
+      );
+    await this.nft.connect(addr1).approve(this.swapNft.address, 1);
+    await this.swapNft.connect(addr1).depositToken(this.nft.address, 1, 1000);
+    await this.swapNft.connect(addr1).withdrawToken(this.nft.address, 1);
+    expect(
+      this.swapNft.connect(addr2).getTokenPrice(this.nft.address, addr1.address)
+    ).to.be.revertedWith("Token invalide or has been withdrawn!");
+  });
 
   // it("Deposit and withdraw", async function () {
   //   const [addr1] = await ethers.getSigners();
