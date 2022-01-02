@@ -58,16 +58,15 @@ contract UniversalSwapNFT is
         _dataToken[tokenContract][msg.sender][externalTokenID] = _newPrice;
     }
 
-    // function purchaseToken(uint256 _tokenId)
-    //     public
-    //     payable 
-    // {
-    //     require(msg.sender != address(0) && msg.sender != address(this), "Purchase not allowed");
-    //     require(msg.value >= _dataTokenPrice[_tokenId], "Insufisent balance!");
-    //     require(_exists(_tokenId));
-    //     address tokenSeller = ownerOf(_tokenId);
-    //     _transfer(tokenSeller, msg.sender, _tokenId);
-    //     (bool success, ) = tokenSeller.call{value: _dataTokenPrice[_tokenId]}("");
-    //     require(success, "Transfer failed.");
-    // }
+    function purchaseToken(address tokenContract, uint256 externalTokenID, address currentOwner)
+        public
+        payable 
+    {
+        require(msg.sender != address(0) && msg.sender != address(this), "Purchase not allowed");
+        require(_dataToken[tokenContract][currentOwner][externalTokenID] > 0, "Token non exists or not in sale!");
+        require(msg.value >= _dataToken[tokenContract][currentOwner][externalTokenID], "Amount invalide!");
+        ERC721(tokenContract).safeTransferFrom(address(this), msg.sender, externalTokenID);
+        (bool success, ) = currentOwner.call{value: _dataToken[tokenContract][currentOwner][externalTokenID]}("");
+        require(success, "Transfer failed.");
+    }
 }

@@ -107,32 +107,36 @@ describe("UniversalNFT/UniversalSwapNFT common functionalities", function () {
     ).to.be.revertedWith("Token invalide or has been withdrawn!");
   });
 
-  // it("Token selling", async function () {
-  //   const [addr1, addr2] = await ethers.getSigners();
-  //   await this.nft
-  //     .connect(addr1)
-  //     .deposit({ value: ethers.BigNumber.from(100000000000000000000n) });
-  //   await this.nft
-  //     .connect(addr2)
-  //     .mintDataNTF(
-  //       addr2.address,
-  //       transaction2.tokenURI,
-  //       transaction2.dataIdOnchain,
-  //       transaction2.dataRegisterProof
-  //     );
+  it("Token selling", async function () {
+    const [addr1, addr2] = await ethers.getSigners();
+    await this.nft
+      .connect(addr1)
+      .mintDataNTF(
+        addr1.address,
+        transaction1.tokenURI,
+        transaction1.dataIdOnchain,
+        transaction1.dataRegisterProof
+      );
 
-  //   await this.nft
-  //     .connect(addr2)
-  //     .setTokenPrice(1, ethers.BigNumber.from(100000000000000000000n));
-  //   const addr2Init = await provider.getBalance(addr2.address);
-  //   await this.nft.connect(addr1).purchaseToken(1, {
-  //     value: ethers.BigNumber.from(100000000000000000000n),
-  //   });
-  //   const addr2Final = await provider.getBalance(addr2.address);
-  //   console.log(
-  //     addr2Init.toString(),
-  //     addr2Final.toString(),
-  //     addr2Final - addr2Init
-  //   );
-  // });
+    await this.nft.connect(addr1).approve(this.swapNft.address, 1);
+    await this.swapNft
+      .connect(addr1)
+      .depositToken(
+        this.nft.address,
+        1,
+        ethers.BigNumber.from(100000000000000000000n)
+      );
+    const addr1Init = await provider.getBalance(addr1.address);
+    await this.swapNft
+      .connect(addr2)
+      .purchaseToken(this.nft.address, 1, addr1.address, {
+        value: ethers.BigNumber.from(100000000000000000000n),
+      });
+    const addr1Final = await provider.getBalance(addr1.address);
+    console.log(
+      addr1Init.toString(),
+      addr1Final.toString(),
+      addr1Final - addr1Init
+    );
+  });
 });
