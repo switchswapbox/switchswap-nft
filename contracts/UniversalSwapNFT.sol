@@ -29,15 +29,6 @@ contract UniversalSwapNFT is
         _dataToken[tokenContract][msg.sender][externalTokenID] = price;
     }
 
-    function getTokenPrice(address tokenContract, address currentOwner, uint256 externalTokenID)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 price = _dataToken[tokenContract][currentOwner][externalTokenID];
-        require(price > 0, "Token invalide or has been withdrawn!");
-        return price;
-    }
 
     function withdrawToken(address tokenContract, uint256 externalTokenID)
         public
@@ -49,14 +40,23 @@ contract UniversalSwapNFT is
         ERC721(tokenContract).safeTransferFrom(address(this), msg.sender, externalTokenID);
     }
 
-    // function setTokenPrice(uint256 _tokenId, uint256 _newPrice)
-    //     public
-    // {
-    //     require(_exists(_tokenId), "ERC721URIStorage: URI query for nonexistent token");
-    //     require(msg.sender == ownerOf(_tokenId), "You are not the owner of the token");
-    //     require(_newPrice > 0);
-    //     _dataTokenPrice[_tokenId] = _newPrice;
-    // }
+    function getTokenPrice(address tokenContract, address currentOwner, uint256 externalTokenID)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 price = _dataToken[tokenContract][currentOwner][externalTokenID];
+        require(price > 0, "Token invalide or has been withdrawn!");
+        return price;
+    }
+
+    function setTokenPrice(address tokenContract, uint256 externalTokenID, uint256 _newPrice)
+        public
+    {
+        require(_dataToken[tokenContract][msg.sender][externalTokenID] > 0, "You are not the owner of the token");
+        require(_newPrice > 0);
+        _dataToken[tokenContract][msg.sender][externalTokenID] = _newPrice;
+    }
 
     // function purchaseToken(uint256 _tokenId)
     //     public

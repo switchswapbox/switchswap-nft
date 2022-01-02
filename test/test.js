@@ -65,6 +65,28 @@ describe("UniversalNFT/UniversalSwapNFT common functionalities", function () {
     ).to.equal("1000");
   });
 
+  it("Set token price", async function () {
+    const [addr1, addr2] = await ethers.getSigners();
+    await this.nft
+      .connect(addr1)
+      .mintDataNTF(
+        addr1.address,
+        transaction1.tokenURI,
+        transaction1.dataIdOnchain,
+        transaction1.dataRegisterProof
+      );
+    await this.nft.connect(addr1).approve(this.swapNft.address, 1);
+    await this.swapNft.connect(addr1).depositToken(this.nft.address, 1, 1000);
+    await this.swapNft.connect(addr1).setTokenPrice(this.nft.address, 1, 9999);
+    expect(
+      (
+        await this.swapNft
+          .connect(addr2)
+          .getTokenPrice(this.nft.address, addr1.address, 1)
+      ).toString()
+    ).to.equal("9999");
+  });
+
   it("Withdraw token", async function () {
     const [addr1, addr2] = await ethers.getSigners();
     await this.nft
@@ -84,19 +106,6 @@ describe("UniversalNFT/UniversalSwapNFT common functionalities", function () {
         .getTokenPrice(this.nft.address, addr1.address, 1)
     ).to.be.revertedWith("Token invalide or has been withdrawn!");
   });
-
-  // it("Deposit and withdraw", async function () {
-  //   const [addr1] = await ethers.getSigners();
-  //   await this.nft.connect(addr1).deposit({ value: 1000 });
-  //   expect(
-  //     (await this.nft.connect(addr1).depositOf(addr1.address)).toString()
-  //   ).to.equal("1000");
-
-  //   await this.nft.connect(addr1).withdraw();
-  //   expect(
-  //     (await this.nft.connect(addr1).depositOf(addr1.address)).toString()
-  //   ).to.equal("0");
-  // });
 
   // it("Token selling", async function () {
   //   const [addr1, addr2] = await ethers.getSigners();
