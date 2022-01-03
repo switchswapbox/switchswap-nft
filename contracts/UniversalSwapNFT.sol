@@ -68,5 +68,6 @@ contract UniversalSwapNFT is
         ERC721(tokenContract).safeTransferFrom(address(this), msg.sender, externalTokenID);
         (bool success, ) = currentOwner.call{value: _dataToken[tokenContract][currentOwner][externalTokenID]}("");
         require(success, "Transfer failed.");
+        _dataToken[tokenContract][currentOwner][externalTokenID] = 0;
     }
 }
